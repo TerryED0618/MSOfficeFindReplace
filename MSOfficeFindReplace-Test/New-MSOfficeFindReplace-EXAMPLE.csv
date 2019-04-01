@@ -1,0 +1,18 @@
+Find,Replace
+(CompanyName),Contoso Ltd.
+(CustomerEmail1),Jane@contoso.com
+(CustomerName1),Jane
+(CustomerEmail2),John@contoso.com
+(CustomerName2),John
+(Team1Email1),Team1@contoso.com
+(Team2Email1),Team1@fabrikam.com
+(Internal1Email1),Internal1@fabrikam.com
+(Internal1Email2),
+(Subject1),A New Opportunity
+(Signature1),Please visit us at https:\\fabrikam.com 
+(AgentName),Bruce
+(AgentEmail),Bruce@fabrikam.com 
+(AgentTelephone),+1(999)999-9999
+incorrect1,correct1
+(incorrect2),correct2
+<incorrect3>,correct3

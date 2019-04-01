@@ -1,38 +1,30 @@
-Function New-MSWordFindReplaceTextFile {
+Function New-MSPowerPointFindReplaceTextFile {
 	<#
 
 		.SYNOPSIS
-			When provided with an open Microsoft Word document, executes a set of text only FindText/ReplaceWith operations throughout the whole document.
+			When provided with an open Microsoft PowerPoint document, executes a set of text only FindText/ReplaceWith operations throughout the whole document.
 
 		.DESCRIPTION	
-			When provided with an open Microsoft Word document file name (wildcards are permitted), executes a set of text only FindText/ReplaceWith operations throughout the whole document.  
-			
-			MS Word supports opening the following file types:
-				*.doc
-				*.docm
-				*.docx
-				*.dot
-				*.dotm
-				*.dotx
-				*.htm
-				*.html
-				*.htm
-				*.html
-				*.mht
-				*.mhtml
-				*.odt
-				*.pdf
-				*.rtf
-				*.txt
-				*.wps
-				*.xml
-				*.xml
-				*.xps
-				
-			Microsoft's Word Range.Find operation performs a simple text match.  There is no support wildcard or regular expressions [RegEx].  Formatting of the FindText is preserved.  
-			To reduce the chance on unintended replacements, surround keywords with a marker.  Parenthesis are safe when used with Microsoft's Word, Excel, Outlook and PowerPoint documents.
+			When provided with an open Microsoft PowerPoint document, executes a set of text only FindText/ReplaceWith operations throughout the whole document.  
+			MS PowerPoint supports opening the following file types:
+				*.odp
+				*.pot
+				*.potm
+				*.potx
+				*.ppa
+				*.ppam
+				*.pps
+				*.ppsm
+				*.ppsx
+				*.ppt
+				*.pptm
+				*.pptx
+				*.pptx
+
+			Microsoft PowerPoint's Range.Replace operation performs a simple text match.  There is no support wildcard or regular expressions [RegEx].  Formatting of the FindText is preserved.  
+			To reduce the chance on unintended replacements, surround keywords with a marker.  Parenthesis are safe when used with Microsoft's Word, PowerPoint, Outlook and PowerPoint documents.
 			For example: (CompanyName)
-			
+				
 		.OUTPUTS
 			One output file is generated per source document file, by default in a subfolder called '.\Reports\'.  Use -OutFolderPath to specify an alternate location.  The output file names are in the format of: 
 				<source file base name>[-<execution source>]-<date/time/timezone stamp>[-<file name tag>].<Extension>
@@ -40,7 +32,7 @@ Function New-MSWordFindReplaceTextFile {
 			If parameter -Debug or -Verbose is specified, then a second file, a PowerShell transcript (.LOG), is created in the same location.
 			
 		.PARAMETER Path String[]
-			Specifies a path to Microsoft Word compatible document file pathname. Wildcards are permitted. The default location is the current directory.
+			Specifies a path to Microsoft PowerPoint compatible document file pathname. Wildcards are permitted. The default location is the current directory.
 			
 		.PARAMETER FindReplacePath String
 			Specifies a path to one Comma Separated Value (CSV) FindReplace file. The CSV must have at least two column headings (case insensitive), all other columns are ignored: 
@@ -116,27 +108,20 @@ Function New-MSWordFindReplaceTextFile {
 		.PARAMETER Include String[]
 			Specifies, as a string array, an item or items that this cmdlet includes in the operation. The value of this parameter qualifies the Path parameter. Enter a path element or pattern, such as *.txt. Wildcards are permitted.
 			
-			The default is MS Word supported file types:
-				*.doc
-				*.docm
-				*.docx
-				*.dot
-				*.dotm
-				*.dotx
-				*.htm
-				*.html
-				*.htm
-				*.html
-				*.mht
-				*.mhtml
-				*.odt
-				*.pdf
-				*.rtf
-				*.txt
-				*.wps
-				*.xml
-				*.xml
-				*.xps
+			The default is MS PowerPoint supported file types:
+				*.odp
+				*.pot
+				*.potm
+				*.potx
+				*.ppa
+				*.ppam
+				*.pps
+				*.ppsm
+				*.ppsx
+				*.ppt
+				*.pptm
+				*.pptx
+				*.pptx
 
 			The Include parameter is effective only when the command includes the Recurse parameter or the path leads to the contents of a directory, such as C:\Windows\*, where the wildcard character specifies the contents of the C:\Windows directory.
 
@@ -147,7 +132,7 @@ Function New-MSWordFindReplaceTextFile {
 			Indicates that this cmdlet gets only the names of the items in the locations. If you pipe the output of this command to another command, only the item names are sent.
 
 		.PARAMETER Path String[]
-			Specifies a path to one or more Microsoft Word compatible document. Wildcards are permitted. The default location is the current directory (.).
+			Specifies a path to one or more Microsoft PowerPoint compatible document. Wildcards are permitted. The default location is the current directory (.).
 
 		.PARAMETER Recurse SwitchParameter
 			Indicates that this cmdlet gets the items in the specified locations and in all child items of the locations.
@@ -187,24 +172,19 @@ Function New-MSWordFindReplaceTextFile {
 		.EXAMPLE
 			Description
 			-----------
-			If find/replace file '.\MyFindReplace.csv's finds matches in Microsoft Word document file '.\MySource.docx' then a new document '.\Reports\MySource-Mine-20190302T235959+12.docx file will be creatd.
+			If find/replace file '.\MyFindReplace.csv's finds matches in Microsoft PowerPoint document file '.\MySource.docx' then a new document '.\Reports\MySource-Mine-20190302T235959+12.docx file will be creatd.
 			
-			New-MSWordFindReplaceTextFile -Path .\MySource.docx -FindReplacePath .\MyFindReplace.csv -ExecutionSource Mine
+			New-MSPowerPointFindReplaceTextFile -Path .\MySource.docx -FindReplacePath .\MyFindReplace.csv -ExecutionSource Mine
 			
 		.NOTE
 			Author: Terry E Dow
-			Creation Date: 2018-03-02
-			Last Modified: 2019-03-14
-
+			Creation Date: 2018-03-30
+			Last Modified: 2019-03-30
+					
 			Warning from Microsoft:
 				Considerations for server-side Automation of Office https://support.microsoft.com/en-us/help/257757/considerations-for-server-side-automation-of-office
 
 			Reference:
-				https://codereview.stackexchange.com/questions/174455/powershell-script-to-find-and-replace-in-word-document-including-header-footer
-				https://docs.microsoft.com/en-us/dotnet/api/microsoft.office.interop.word.find.execute
-				https://learn-powershell.net/2014/12/31/beginning-with-powershell-and-word/
-				https://wordmvp.com/FAQs/MacrosVBA/FindReplaceAllWithVBA.htm
-				https://wordribbon.tips.net/T011489_Including_Headers_and_Footers_when_Selecting_All.html				
 	#>
 	[CmdletBinding(
 		SupportsShouldProcess = $TRUE # Enable support for -WhatIf by invoked destructive cmdlets.
@@ -277,8 +257,8 @@ Function New-MSWordFindReplaceTextFile {
 		[Parameter(
 		ValueFromPipeline=$TRUE,
 		ValueFromPipelineByPropertyName=$TRUE )]
-		[String[]] $Include = ( '*.doc', '*.docm', '*.docx', '*.dot', '*.dotm', '*.dotx', '*.htm', '*.html', '*.htm', '*.html', '*.mht', '*.mhtml', '*.odt', '*.pdf', '*.rtf', '*.txt', '*.wps', '*.xml', '*.xml', '*.xps' ),
-
+		[String[]] $Include = ( '*.odp', '*.pot', '*.potm', '*.potx', '*.ppa', '*.ppam', '*.pps', '*.ppsm', '*.ppsx', '*.ppt', '*.pptm', '*.pptx', '*.pptx' ),
+		
 		[Parameter(
 		ValueFromPipeline=$TRUE,
 		ValueFromPipelineByPropertyName=$TRUE )]
@@ -412,6 +392,7 @@ Function New-MSWordFindReplaceTextFile {
 	Import-CSV -Path $FindReplacePath |
 		ForEach-Object{
 			$findReplaceRecordCounter++
+			# NOT VERIFIED if this test is required by PowerPoint Range.Replace method.
 			If ( $PSItem.Find.Length -LE 256 -And $PSItem.Replace.Length -LE 255 ) {
 				Write-Debug "`$PSItem.Find.Length:,$($PSItem.Find.Length)"
 				Write-Debug "`$PSItem.Replace.Length:,$($PSItem.Replace.Length)"
@@ -435,49 +416,46 @@ Function New-MSWordFindReplaceTextFile {
 	
 	#---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 
-	# Start Microsoft Word application.
-	# [Microsoft.Office.Interop.Word.ApplicationClass]
-	$wordApp = New-Object -ComObject Word.Application
-	$wordApp.Visible = [Microsoft.Office.Core.MsoTriState]::msoFalse
-	
+	# Start Microsoft PowerPoint application.
+	# [Microsoft.Office.Interop.PowerPoint.ApplicationClass]
+	$PowerPointApp = New-Object -ComObject PowerPoint.Application
+		
 	Get-ChildItem @getChildItemParameters |
 		ForEach-Object {
-	
-			# Open Microsoft Word document.  
-			# [Microsoft.Office.Interop.Word.Documents]
-			# FileName, ConfirmConversions, ReadOnly, AddToRecentFiles, PasswordDocument, PasswordTemplate, Revert, WritePasswordDocument, WritePasswordTemplate, Format, Encoding, Visible, OpenAndRepair, DocumentDirection, NoEncodingDialog, XMLTransform
-			$document = $wordApp.Documents.Open( $PSItem.FullName, $FALSE, $TRUE ) # FileName, ConfirmConversions, ReadOnly
+		
+			# Open Microsoft PowerPoint document read-only
+			# [Microsoft.Office.Interop.PowerPoint.Presentations]
+			$document = $PowerPointApp.Presentations.Open( $PSItem.FullName, [Microsoft.Office.Core.MsoTriState]::msoTrue, [Microsoft.Office.Core.MsoTriState]::msoFalse, [Microsoft.Office.Core.MsoTriState]::msoFalse ) # FileName, ReadOnly, Untitled, WithWindow
 			 
 			$outFilePathName = ( $( ( "$($outFilePathBase.FolderPath)$($PSItem.BaseName)",  $ExecutionSource, $outFilePathBase.DateTimeStamp, $OutFileNameTag ) | Where-Object { $PSItem } ) -Join '-').Trim( '-' ) +  $PSItem.Extension
 			Write-Debug "`$outFilePathName: $outFilePathName"
 			
 			# Update document, checking if any replacements were executed.  
-			If ( Update-MSWordFindReplaceTextDocument -Document $document -FindReplaceTable $findReplaceTable ) {
+			If ( Update-MSPowerPointFindReplaceTextDocument -Document $document -FindReplaceTable $findReplaceTable ) {
 			
 				# Replacements executed, save document.
-				$document.SaveAs( [Ref] $outFilePathName )
-				$document.Close( [Microsoft.Office.Interop.Word.WdSaveOptions]::wdSaveChanges, [Microsoft.Office.Interop.Word.WdOriginalFormat]::wdOriginalDocumentFormat ) # SaveChanges, OriginalFormat
+				$document.SaveAs( $outFilePathName ) # Filename, FileFormat, EmbedTrueTypeFonts
 				
 				# Write metrics.
 				Out-Host -InputObject "New document saved to '$outFilePathName'."	
 			} Else {
-			
-				# No replacements executed, don't save document.
-				$document.Close( [Microsoft.Office.Interop.Word.WdSaveOptions]::wdDoNotSaveChanges  ) # SaveChanges
-				
+							
 				# Write metrics.
 				Out-Host -InputObject "No FindText found in '$($PSItem.FullName)'"	
 			}
+			
+			$document.Close() 
+				
 		}
-	
-	# Close Microsoft Word application.  
-	$wordApp.Quit()
+		
+	# Close Microsoft PowerPoint application.  
+	$PowerPointApp.Quit()
 	
 	# Free up memory.  
-	$NULL = [System.Runtime.InteropServices.Marshal]::ReleaseComObject([System.__ComObject]$wordApp)
+	$NULL = [System.Runtime.InteropServices.Marshal]::ReleaseComObject([System.__ComObject]$PowerPointApp)
 	[gc]::Collect()
 	[gc]::WaitForPendingFinalizers()
-	Remove-Variable wordApp 
+	Remove-Variable PowerPointApp 
 
 	#region Script Footer
 
@@ -494,7 +472,7 @@ Function New-MSWordFindReplaceTextFile {
 			$reportType = 'Report'
 		}
 
-		$messageSubject = "New Microsoft Word replace text $reportType for $($outFilePathBase.ExecutionSourceName) on $((Get-Date).ToString('s'))"
+		$messageSubject = "New Microsoft PowerPoint replace text $reportType for $($outFilePathBase.ExecutionSourceName) on $((Get-Date).ToString('s'))"
 
 		# If the out file is larger then a specified limit (message size limit), then create a compressed (zipped) copy.
 		Write-Debug "$outFilePathName.Length:,$((Get-ChildItem -LiteralPath $outFilePathName).Length)"
@@ -542,7 +520,7 @@ Function New-MSWordFindReplaceTextFile {
 				-To $MailTo `
 				-SmtpServer $MailServer `
 				-Subject $messageSubject `
-				-Body 'See attached zipped Excel (CSV) spreadsheet.' `
+				-Body 'See attached zipped PowerPoint (CSV) spreadsheet.' `
 				-Attachments $outZipFilePathName
 
 			# Remove the temporary zip file.
@@ -556,7 +534,7 @@ Function New-MSWordFindReplaceTextFile {
 				-To $MailTo `
 				-SmtpServer $MailServer `
 				-Subject $messageSubject `
-				-Body 'See attached Excel (CSV) spreadsheet.' `
+				-Body 'See attached PowerPoint (CSV) spreadsheet.' `
 				-Attachments $outFilePathName
 		}
 	}

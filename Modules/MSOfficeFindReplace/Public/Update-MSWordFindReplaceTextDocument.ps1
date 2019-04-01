@@ -2,11 +2,37 @@ Function Update-MSWordFindReplaceTextDocument {
 	<#
 
 		.SYNOPSIS
-			When provided with an open Microsoft Word document, perform a set of text only FindText/ReplaceWith executions throughout the whole document.
+			When provided with an open Microsoft Word document, executes a set of text only FindText/ReplaceWith operations throughout the whole document.
 
 		.DESCRIPTION	
-			When provided with an open Microsoft Word document (Word.Application's Documents.Open), perform a set of text only FindText/ReplaceWith executions throughout the whole document.  
+			When provided with an open Microsoft Word document (Word.Application's Documents.Open), executes a set of text only FindText/ReplaceWith operations throughout the whole document.  
 
+			MS Word supports opening the following file types:
+				*.doc
+				*.docm
+				*.docx
+				*.dot
+				*.dotm
+				*.dotx
+				*.htm
+				*.html
+				*.htm
+				*.html
+				*.mht
+				*.mhtml
+				*.odt
+				*.pdf
+				*.rtf
+				*.txt
+				*.wps
+				*.xml
+				*.xml
+				*.xps
+
+			Microsoft's Word Range.Find operation performs a simple text match.  There is no support wildcard or regular expressions [RegEx]. Formatting of the FindText is preserved.  
+			To reduce the chance on unintended replacements, surround keywords with a marker.  Parenthesis are safe when used with Microsoft's Word, Excel, Outlook and PowerPoint documents.
+			For example: (CompanyName)
+			
 		.OUTPUTS
 			The output of this function is the modifications executed on the open document.
 			The returned value from this function is the number of replacements made.  
@@ -22,14 +48,14 @@ Function Update-MSWordFindReplaceTextDocument {
 			-----------
 				This example opens a Mircosoft Word application,
 				opens a MS Word document named '.\MySource.docx' in read only mode,
-				creates a substution hash table with 2 entries,
+				creates a substitution hash table with 2 entries,
 				and then calls this function.
 				After the document is saved to another file name,
 				and closed.  
 			
 				$wordApp = New-Object -ComObject Word.Application
 				$document = $wordApp.Documents.Open( '.\MySource.docx', $FALSE, $TRUE ) # FileName, ConfirmConversions, ReadOnly
-				$findReplace = @{ 'INCORRECT' = 'correct'; '<Field>' = 'MyFieldValue' }
+				$findReplace = @{ 'INCORRECT' = 'correct'; '(Field)' = 'MyFieldValue' }
 				
 				Update-MSWordFindReplaceTextDocument -Document $document -FindReplaceTable $findReplace
 				
@@ -40,6 +66,9 @@ Function Update-MSWordFindReplaceTextDocument {
 			Author: Terry E Dow
 			Creation Date: 2018-03-02
 			Last Modified: 2019-03-16
+			
+			Warning from Microsoft:
+				Considerations for server-side Automation of Office https://support.microsoft.com/en-us/help/257757/considerations-for-server-side-automation-of-office
 
 			Reference:
 				https://codereview.stackexchange.com/questions/174455/powershell-script-to-find-and-replace-in-word-document-including-header-footer
@@ -124,10 +153,16 @@ Function Update-MSWordFindReplaceTextDocument {
 						$replacementCountTotal += $replacementCount
 					}			
 			}
-			
+
 	}
 	
 	End {
+		#If ( $replacementCountTotal ) {
+		#	# Update Document's Table of Contents.
+		#	$tablesOfContents = $Document.TablesOfContents
+		#	$tablesOfContents.Update()
+		#}
+		
 		Write-Output $replacementCountTotal 
 	}
 }
