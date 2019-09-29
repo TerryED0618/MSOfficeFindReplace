@@ -258,9 +258,11 @@
 		For example: (CompanyName)
 			
 ###	OUTPUTS
-		One output file is generated per source document file, by default in a subfolder called '.\Reports\'.  Use -OutFolderPath to specify an alternate location.  The output file names are in the format of: 
-			<source file base name>[-<execution source>]-<date/time/timezone stamp>[-<file name tag>].<Extension>
-			
+		If SaveToDrafts is not enabled, one output file is generated per source document file, by default in a subfolder called '.\Reports\'.  Use -OutFolderPath to specify an alternate location.  The output file names are in the format of: 
+				<source file base name>[-<execution source>]-<date/time/timezone stamp>[-<file name tag>].<Extension>
+				
+		If SaveToDrafts is enabled, one message is generated per source document file and is saved in the default Outlook folder.
+				
 		If parameter -Debug or -Verbose is specified, then a second file, a PowerShell transcript (.LOG), is created in the same location.
 			
 ###	PARAMETER Path String[]
@@ -270,7 +272,10 @@
 		Specifies a path to one Comma Separated Value (CSV) FindReplace file. The CSV must have at least two column headings (case insensitive), all other columns are ignored: 
 		Find,Replace
 
-		
+###	PARAMETER SaveToDrafts Switch
+			If enabled, the resultant document is not saved to a file, but in the default Outlook Drafts folder.  
+
+
 ###	PARAMETER Attributes FileAttributes
 		Gets files and folders with the specified attributes. This parameter supports all attributes and lets you specify complex combinations of attributes.
 
