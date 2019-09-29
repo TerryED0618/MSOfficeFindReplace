@@ -22,8 +22,10 @@ Function New-MSOutlookFindReplaceTextFile {
 			For example: (CompanyName)
 			
 		.OUTPUTS
-			One output file is generated per source document file, by default in a subfolder called '.\Reports\'.  Use -OutFolderPath to specify an alternate location.  The output file names are in the format of: 
+			If SaveToDrafts is not enabled, one output file is generated per source document file, by default in a subfolder called '.\Reports\'.  Use -OutFolderPath to specify an alternate location.  The output file names are in the format of: 
 				<source file base name>[-<execution source>]-<date/time/timezone stamp>[-<file name tag>].<Extension>
+				
+			If SaveToDrafts is enabled, one message is generated per source document file and is saved in the default Outlook folder.
 				
 			If parameter -Debug or -Verbose is specified, then a second file, a PowerShell transcript (.LOG), is created in the same location.
 			
@@ -34,6 +36,8 @@ Function New-MSOutlookFindReplaceTextFile {
 			Specifies a path to one Comma Separated Value (CSV) FindReplace file. The CSV must have at least two column headings (case insensitive), all other columns are ignored: 
 			Find,Replace
 
+		.PARAMETER SaveToDrafts Switch
+			If enabled, the resultant document is not saved to a file, but in the default Outlook Drafts folder.  
 		
 		.PARAMETER Attributes FileAttributes
 			Gets files and folders with the specified attributes. This parameter supports all attributes and lets you specify complex combinations of attributes.
@@ -164,7 +168,7 @@ Function New-MSOutlookFindReplaceTextFile {
 		.NOTE
 			Author: Terry E Dow
 			Creation Date: 2018-03-17
-			Last Modified: 2019-03-17
+			Last Modified: 2019-09-29
 			
 			Warning from Microsoft:
 				Considerations for server-side Automation of Office https://support.microsoft.com/en-us/help/257757/considerations-for-server-side-automation-of-office
@@ -186,7 +190,12 @@ Function New-MSOutlookFindReplaceTextFile {
 		[ValidateScript({ If (Test-Path -Path $PSItem -PathType 'Leaf') {$TRUE} Else { Throw 'File not found.' } })] 
 		[String] $FindReplacePath = $NULL,
 
-		
+		[Parameter(
+		ValueFromPipeline=$TRUE,
+		ValueFromPipelineByPropertyName=$TRUE )]
+		[Switch] $SaveToDrafts = $NULL,
+
+
 		[Parameter(
 		ValueFromPipeline=$TRUE,
 		ValueFromPipelineByPropertyName=$TRUE )]
@@ -430,16 +439,25 @@ Function New-MSOutlookFindReplaceTextFile {
 			# Update document, checking if any replacements were executed.  
 			If ( Update-MSOutlookFindReplaceTextDocument -Document $document -FindReplaceTable $findReplaceTable ) {
 			
-				# Replacements executed, save document.
-				$document.SaveAs( [Ref] $outFilePathName )
-				$document.Close( [Microsoft.Office.Interop.Outlook.OlInspectorClose]::olSave ) # SaveMode
-				
-				# Write metrics.
-				Out-Host -InputObject "New document saved to '$outFilePathName'."	
-			} Else {
+				If ( $SaveToDrafts ) {
 			
-				# No replacements executed, don't save document.
-				$document.Close( [Microsoft.Office.Interop.Outlook.OlInspectorClose]::olDiscard ) # SaveMode
+					# Replacements executed, save to Outlook Drafts folder.
+					$document.Close( [Microsoft.Office.Interop.Outlook.OlInspectorClose]::olSave ) # SaveMode
+					
+					# Write metrics.
+					Out-Host -InputObject "New document '$($PSItem.FullName)' saved to Outlook Drafts folder."	
+				
+				} Else {
+				
+					# Replacements executed, save document to file.
+					$document.SaveAs( [Ref] $outFilePathName )
+					# Discard copy from Outlook Drafts folder.
+					$document.Close( [Microsoft.Office.Interop.Outlook.OlInspectorClose]::olDiscard ) # SaveMode
+					
+					# Write metrics.
+					Out-Host -InputObject "New document saved to file '$outFilePathName'."	
+				}
+			} Else {
 				
 				# Write metrics.
 				Out-Host -InputObject "No FindText found in '$($PSItem.FullName)'"	
